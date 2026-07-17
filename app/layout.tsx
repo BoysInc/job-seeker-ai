@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import { Analytics } from "@vercel/analytics/next";
 import { SessionGuard } from "@/features/auth/components/session-guard";
 
 const geistSans = Geist({
@@ -45,9 +45,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-          <SessionGuard />
-          {children}
-        </body>
+        <SessionGuard />
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
