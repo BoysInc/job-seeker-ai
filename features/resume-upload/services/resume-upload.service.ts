@@ -3,6 +3,7 @@ import type {
   FindJobsStarted,
   RecommendationStatus,
   RecommendationsPoll,
+  ResumeDownload,
   ResumeSummary,
   ResumeUploadStarted,
 } from "@/features/resume-upload/models/resume-upload.model";
@@ -27,6 +28,14 @@ type BackendResumeSummary = {
   file_name: string | null;
   created_at: string;
   is_active: boolean;
+  has_file: boolean;
+};
+
+type BackendResumeDownloadResponse = {
+  url?: string;
+  file_name?: string | null;
+  detail?: string;
+  message?: string;
 };
 
 type BackendResumeListResponse = {
@@ -163,6 +172,7 @@ const toResumeSummary = (resume: BackendResumeSummary): ResumeSummary => ({
   fileName: resume.file_name,
   createdAt: resume.created_at,
   isActive: resume.is_active,
+  hasFile: resume.has_file,
 });
 
 export const listResumes = async (accessToken: string): Promise<ResumeSummary[]> => {
@@ -222,4 +232,38 @@ export const deleteResume = async (
       await parseErrorMessage(response, "Could not delete this resume. Please try again.")
     );
   }
+};
+
+export const getResumeDownloadUrl = async (
+  resumeId: string,
+  accessToken: string
+): Promise<ResumeDownload> => {
+  const response = await fetch(
+    `${getBackendBaseUrl()}/pdf/resume/${resumeId}/download`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      await parseErrorMessage(
+        response,
+        "Could not open this resume. Please try again."
+      )
+    );
+  }
+
+  const payload = (await response.json()) as BackendResumeDownloadResponse;
+
+  if (!payload.url) {
+    throw new Error("Backend response did not include a download URL.");
+  }
+
+  return {
+    url: payload.url,
+    fileName: payload.file_name ?? null,
+  };
 };

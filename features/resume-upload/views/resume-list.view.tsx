@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { AppNavbar } from "@/components/app-navbar";
+import { FileDropzone } from "@/components/file-dropzone";
 import { NavAuthActions } from "@/components/nav-auth-actions";
 import {
   AlertDialog,
@@ -19,7 +20,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import type { ResumeSummary } from "@/features/resume-upload/models/resume-upload.model";
+import {
+  formatFileSize,
+  type ResumeSummary,
+} from "@/features/resume-upload/models/resume-upload.model";
 import type { ResumeListStatus } from "@/features/resume-upload/store/resume-list.store";
 
 type ResumeListViewProps = {
@@ -28,10 +32,19 @@ type ResumeListViewProps = {
   errorMessage: string | null;
   activatingId: string | null;
   deletingId: string | null;
+  viewingId: string | null;
+  downloadingId: string | null;
+  selectedFile: File | null;
+  uploadErrorMessage: string | null;
   isLoading: boolean;
+  isUploading: boolean;
   onActivate: (resumeId: string) => void;
   onDelete: (resumeId: string) => void;
   onFindJobs: (resumeId: string) => void;
+  onView: (resumeId: string) => void;
+  onDownload: (resumeId: string) => void;
+  onFilePick: (file: File | null) => void;
+  onUploadNew: () => void;
 };
 
 const formatUploadedAt = (isoDate: string) => {
@@ -48,10 +61,19 @@ export const ResumeListView = ({
   errorMessage,
   activatingId,
   deletingId,
+  viewingId,
+  downloadingId,
+  selectedFile,
+  uploadErrorMessage,
   isLoading,
+  isUploading,
   onActivate,
   onDelete,
   onFindJobs,
+  onView,
+  onDownload,
+  onFilePick,
+  onUploadNew,
 }: ResumeListViewProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const pendingDeleteResume = resumes.find(
@@ -64,7 +86,7 @@ export const ResumeListView = ({
         actions={
           <>
             <Button render={<Link href="/" />} variant="secondary">
-              Upload new resume
+              Find matching jobs
             </Button>
             <NavAuthActions />
           </>
@@ -83,6 +105,38 @@ export const ResumeListView = ({
             use for job matching and analysis as your active resume.
           </p>
 
+          <Card className="mt-6 max-w-2xl rounded-3xl border-dashed p-4 sm:p-5">
+            <p className="text-sm font-semibold">Upload a new resume</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Saved right away — no AI analysis runs. It becomes your active
+              resume for future matching.
+            </p>
+
+            <FileDropzone
+              file={selectedFile}
+              fileMeta={selectedFile ? formatFileSize(selectedFile.size) : null}
+              onFileSelect={onFilePick}
+              className="mt-3"
+            />
+
+            {uploadErrorMessage ? (
+              <Alert variant="destructive" className="mt-3">
+                <AlertDescription>{uploadErrorMessage}</AlertDescription>
+              </Alert>
+            ) : null}
+
+            {selectedFile ? (
+              <Button
+                type="button"
+                onClick={onUploadNew}
+                disabled={isUploading}
+                className="mt-3 h-11 w-full rounded-full text-sm sm:w-auto"
+              >
+                {isUploading ? "Uploading..." : "Upload resume"}
+              </Button>
+            ) : null}
+          </Card>
+
           {errorMessage ? (
             <Alert variant="destructive" className="mt-6 max-w-2xl">
               <AlertDescription>{errorMessage}</AlertDescription>
@@ -97,13 +151,8 @@ export const ResumeListView = ({
 
           {!isLoading && status !== "loading" && resumes.length === 0 ? (
             <Card className="mt-8 rounded-3xl border-dashed p-6 text-sm leading-6 text-muted-foreground sm:p-8">
-              You have not uploaded a resume yet.
-              <Button
-                render={<Link href="/" />}
-                className="mt-4 h-11 w-full rounded-full sm:w-auto"
-              >
-                Upload resume
-              </Button>
+              You have not uploaded a resume yet. Use the box above to upload
+              your first one.
             </Card>
           ) : null}
 
@@ -112,7 +161,9 @@ export const ResumeListView = ({
               {resumes.map((resume) => {
                 const isActivating = activatingId === resume.id;
                 const isDeleting = deletingId === resume.id;
-                const isBusy = isActivating || isDeleting;
+                const isViewing = viewingId === resume.id;
+                const isDownloading = downloadingId === resume.id;
+                const isBusy = isActivating || isDeleting || isViewing || isDownloading;
 
                 return (
                   <Card
@@ -144,6 +195,28 @@ export const ResumeListView = ({
                           {isActivating ? "Setting active..." : "Set active"}
                         </Button>
                       )}
+                      {resume.hasFile ? (
+                        <>
+                          <Button
+                            type="button"
+                            onClick={() => onView(resume.id)}
+                            disabled={isBusy}
+                            variant="outline"
+                            className="h-10 rounded-full px-4 text-sm"
+                          >
+                            {isViewing ? "Opening..." : "View"}
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => onDownload(resume.id)}
+                            disabled={isBusy}
+                            variant="outline"
+                            className="h-10 rounded-full px-4 text-sm"
+                          >
+                            {isDownloading ? "Downloading..." : "Download"}
+                          </Button>
+                        </>
+                      ) : null}
                       <Button
                         type="button"
                         onClick={() => onFindJobs(resume.id)}

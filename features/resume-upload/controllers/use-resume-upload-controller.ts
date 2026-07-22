@@ -11,24 +11,12 @@ import {
   type JobSearchResult,
 } from "@/features/resume-upload/models/job-search.model";
 import {
-  ACCEPTED_RESUME_EXTENSIONS,
-  ACCEPTED_RESUME_TYPES,
   MAX_RESUME_SIZE_BYTES,
   formatFileSize,
+  isAllowedResumeFileType,
 } from "@/features/resume-upload/models/resume-upload.model";
 import { searchJobs } from "@/features/resume-upload/services/job-search.service";
 import { useResumeUploadStore } from "@/features/resume-upload/store/resume-upload.store";
-
-const isAllowedFileType = (file: File): boolean => {
-  if (ACCEPTED_RESUME_TYPES.includes(file.type as (typeof ACCEPTED_RESUME_TYPES)[number])) {
-    return true;
-  }
-
-  const fileExtension = `.${file.name.split(".").pop()?.toLowerCase() ?? ""}`;
-  return ACCEPTED_RESUME_EXTENSIONS.includes(
-    fileExtension as (typeof ACCEPTED_RESUME_EXTENSIONS)[number]
-  );
-};
 
 export const useResumeUploadController = () => {
   const router = useRouter();
@@ -90,7 +78,7 @@ export const useResumeUploadController = () => {
         return;
       }
 
-      if (!isAllowedFileType(file)) {
+      if (!isAllowedResumeFileType(file)) {
         setSelectedFile(null);
         setUploadStatus("error");
         setErrorMessage("Only PDF files are allowed.");

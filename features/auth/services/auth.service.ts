@@ -1,13 +1,19 @@
 import type {
   AuthResponse,
+  ForgotPasswordRequest,
   LoginRequest,
   MeResponse,
+  ResetPasswordRequest,
   SignupRequest,
 } from "@/features/auth/models/auth.model";
 
 type AuthErrorResponse = {
   message?: string;
   detail?: string;
+};
+
+type MessageResponse = {
+  message: string;
 };
 
 const parseAuthError = async (response: Response): Promise<string> => {
@@ -48,6 +54,47 @@ export const loginWithBackend = (request: LoginRequest) => {
 
 export const signupWithBackend = (request: SignupRequest) => {
   return postAuthRequest("/api/auth/signup", request);
+};
+
+export const requestPasswordReset = async (
+  request: ForgotPasswordRequest
+): Promise<MessageResponse> => {
+  const response = await fetch("/api/auth/forgot-password", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseAuthError(response));
+  }
+
+  return (await response.json()) as MessageResponse;
+};
+
+export const confirmPasswordReset = async (
+  request: ResetPasswordRequest
+): Promise<MessageResponse> => {
+  const response = await fetch("/api/auth/reset-password", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      access_token: request.accessToken,
+      new_password: request.newPassword,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseAuthError(response));
+  }
+
+  return (await response.json()) as MessageResponse;
 };
 
 export const checkSession = async (

@@ -45,6 +45,20 @@ export type SignupRequest = LoginRequest & {
 
 export type AuthFormValues = SignupRequest;
 
+export type ForgotPasswordRequest = {
+  email: string;
+};
+
+export type ResetPasswordRequest = {
+  accessToken: string;
+  newPassword: string;
+};
+
+export type ResetPasswordFormValues = {
+  password: string;
+  confirmPassword: string;
+};
+
 export type AuthStatus =
   | "idle"
   | "loading"

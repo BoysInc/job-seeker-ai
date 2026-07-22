@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import type { FormEventHandler } from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 
@@ -10,8 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Progress } from "@/components/ui/progress";
 import type { AuthFormValues } from "@/features/auth/models/auth.model";
+import {
+  getPasswordStrength,
+  passwordRules,
+  validateStrongPassword,
+} from "@/features/auth/utils/password-strength";
 
 type AuthMode = "login" | "signup";
 
@@ -25,73 +30,6 @@ type AuthFormViewProps = {
   onSubmit: FormEventHandler<HTMLFormElement>;
 };
 
-const passwordRules = [
-  {
-    label: "At least 8 characters",
-    test: (password: string) => password.length >= 8,
-  },
-  {
-    label: "One uppercase letter",
-    test: (password: string) => /[A-Z]/.test(password),
-  },
-  {
-    label: "One lowercase letter",
-    test: (password: string) => /[a-z]/.test(password),
-  },
-  {
-    label: "One number",
-    test: (password: string) => /\d/.test(password),
-  },
-  {
-    label: "One special character",
-    test: (password: string) => /[^A-Za-z0-9]/.test(password),
-  },
-];
-
-const getPasswordStrength = (password: string) => {
-  const passedRules = passwordRules.filter((rule) => rule.test(password));
-  const score = passedRules.length;
-
-  if (!password) {
-    return {
-      score,
-      label: "Enter a password",
-      indicatorClassName: "**:data-[slot=progress-indicator]:bg-zinc-200",
-      textClassName: "text-zinc-500",
-    };
-  }
-
-  if (score <= 2) {
-    return {
-      score,
-      label: "Weak",
-      indicatorClassName: "**:data-[slot=progress-indicator]:bg-red-500",
-      textClassName: "text-red-600",
-    };
-  }
-
-  if (score <= 4) {
-    return {
-      score,
-      label: "Medium",
-      indicatorClassName: "**:data-[slot=progress-indicator]:bg-amber-500",
-      textClassName: "text-amber-600",
-    };
-  }
-
-  return {
-    score,
-    label: "Strong",
-    indicatorClassName: "**:data-[slot=progress-indicator]:bg-[#5f9d38]",
-    textClassName: "text-[#5f9d38]",
-  };
-};
-
-const validateStrongPassword = (password: string) => {
-  const failedRule = passwordRules.find((rule) => !rule.test(password));
-  return failedRule ? failedRule.label : true;
-};
-
 export const AuthFormView = ({
   mode,
   errors,
@@ -101,7 +39,6 @@ export const AuthFormView = ({
   register,
   onSubmit,
 }: AuthFormViewProps) => {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isSignup = mode === "signup";
   const title = isSignup ? "Create your account." : "Welcome back.";
   const subtitle = isSignup
@@ -175,70 +112,25 @@ export const AuthFormView = ({
           </Label>
 
           <Label className="grid gap-2 text-sm font-semibold text-zinc-700">
-            Password
-            <div className="relative">
-              <Input
-                type={isPasswordVisible ? "text" : "password"}
-                {...register("password", {
-                  required: "Enter your password.",
-                  validate: isSignup ? validateStrongPassword : undefined,
-                })}
-                autoComplete={isSignup ? "new-password" : "current-password"}
-                className="h-12 w-full rounded-2xl border-[#dfeecf] bg-[#fbfef8] px-4 pr-12 font-normal focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-accent"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => setIsPasswordVisible((current) => !current)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full text-zinc-500 hover:bg-accent hover:text-zinc-900"
-                aria-label={
-                  isPasswordVisible ? "Hide password" : "Show password"
-                }
-                aria-pressed={isPasswordVisible}
-              >
-                {isPasswordVisible ? (
-                  <svg
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden
-                  >
-                    <path
-                      d="M3 3L21 21M10.7 5.1C11.1 5 11.5 5 12 5C17.5 5 21 12 21 12C20.3 13.4 19.4 14.7 18.3 15.8M14.1 14.1C13.6 14.7 12.8 15 12 15C10.3 15 9 13.7 9 12C9 11.2 9.3 10.4 9.9 9.9M6.6 6.6C4.3 8.1 3 12 3 12C3 12 6.5 19 12 19C13.6 19 15 18.4 16.2 17.6"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden
-                  >
-                    <path
-                      d="M3 12C3 12 6.5 5 12 5C17.5 5 21 12 21 12C21 12 17.5 19 12 19C6.5 19 3 12 3 12Z"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M12 15C13.7 15 15 13.7 15 12C15 10.3 13.7 9 12 9C10.3 9 9 10.3 9 12C9 13.7 10.3 15 12 15Z"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                )}
-              </Button>
-            </div>
+            <span className="flex items-center justify-between">
+              Password
+              {!isSignup ? (
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-semibold text-[#5f9d38] transition hover:text-[#4d842d]"
+                >
+                  Forgot password?
+                </Link>
+              ) : null}
+            </span>
+            <PasswordInput
+              {...register("password", {
+                required: "Enter your password.",
+                validate: isSignup ? validateStrongPassword : undefined,
+              })}
+              autoComplete={isSignup ? "new-password" : "current-password"}
+              className="h-12 rounded-2xl border-[#dfeecf] bg-[#fbfef8] px-4 font-normal focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-accent"
+            />
             {errors.password?.message ? (
               <span className="text-xs font-medium text-red-600">
                 {errors.password.message}

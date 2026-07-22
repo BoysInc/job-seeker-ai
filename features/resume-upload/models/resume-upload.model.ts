@@ -50,6 +50,27 @@ export type ResumeSummary = {
   fileName: string | null;
   createdAt: string;
   isActive: boolean;
+  hasFile: boolean;
+};
+
+export type ResumeDownload = {
+  url: string;
+  fileName: string | null;
+};
+
+export const isAllowedResumeFileType = (file: File): boolean => {
+  if (
+    ACCEPTED_RESUME_TYPES.includes(
+      file.type as (typeof ACCEPTED_RESUME_TYPES)[number]
+    )
+  ) {
+    return true;
+  }
+
+  const fileExtension = `.${file.name.split(".").pop()?.toLowerCase() ?? ""}`;
+  return ACCEPTED_RESUME_EXTENSIONS.includes(
+    fileExtension as (typeof ACCEPTED_RESUME_EXTENSIONS)[number]
+  );
 };
 
 export const formatFileSize = (sizeInBytes: number): string => {

@@ -14,7 +14,13 @@ import {
 } from "@/features/auth/services/auth.service";
 import { useAuthStore } from "@/features/auth/store/auth.store";
 
-const PUBLIC_PATHS = ["/login", "/signup", "/design-preview"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/design-preview",
+];
 
 export const useAuth = () => {
   const router = useRouter();
