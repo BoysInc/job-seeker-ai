@@ -7,7 +7,9 @@ import type { SubmitHandler } from "react-hook-form";
 
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import type { AuthFormValues } from "@/features/auth/models/auth.model";
+import { resendConfirmationEmail } from "@/features/auth/services/auth.service";
 import { AuthFormView } from "@/features/auth/views/auth-form.view";
+import { VerifyEmailView } from "@/features/auth/views/verify-email.view";
 
 type AuthFeatureProps = {
   mode: "login" | "signup";
@@ -26,6 +28,12 @@ export const AuthFeature = ({ mode }: AuthFeatureProps) => {
   const [formError, setFormError] = useState<string | null>(null);
   const [debouncedPassword, setDebouncedPassword] = useState("");
   const hasPasswordChanged = useRef(false);
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState<
+    string | null
+  >(null);
+  const [isResending, setIsResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [resendError, setResendError] = useState<string | null>(null);
   const {
     control,
     formState: { errors },
@@ -37,6 +45,7 @@ export const AuthFeature = ({ mode }: AuthFeatureProps) => {
       name: "",
       email: "",
       password: "",
+      agreeToTerms: false,
     },
   });
   const password = useWatch({ control, name: "password" }) ?? "";
@@ -78,11 +87,19 @@ export const AuthFeature = ({ mode }: AuthFeatureProps) => {
 
     try {
       if (mode === "signup") {
-        await signup({
+        const auth = await signup({
           name: trimmedName,
           email: trimmedEmail,
           password: values.password,
         });
+
+        if (!auth.session) {
+          // Supabase requires email verification before a session is
+          // issued - show the "check your inbox" step instead of
+          // redirecting into the app with no way to actually sign in.
+          setPendingVerificationEmail(trimmedEmail);
+          return;
+        }
       } else {
         await login({
           email: trimmedEmail,
@@ -96,9 +113,45 @@ export const AuthFeature = ({ mode }: AuthFeatureProps) => {
     }
   };
 
+  const handleResend = async () => {
+    if (!pendingVerificationEmail) return;
+
+    setIsResending(true);
+    setResendMessage(null);
+    setResendError(null);
+
+    try {
+      const response = await resendConfirmationEmail({
+        email: pendingVerificationEmail,
+      });
+      setResendMessage(response.message);
+    } catch (error) {
+      setResendError(
+        error instanceof Error
+          ? error.message
+          : "Could not resend the verification email."
+      );
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  if (pendingVerificationEmail) {
+    return (
+      <VerifyEmailView
+        email={pendingVerificationEmail}
+        isResending={isResending}
+        resendMessage={resendMessage}
+        resendError={resendError}
+        onResend={handleResend}
+      />
+    );
+  }
+
   return (
     <AuthFormView
       mode={mode}
+      control={control}
       errors={errors}
       errorMessage={formError ?? errorMessage}
       isLoading={isLoading}

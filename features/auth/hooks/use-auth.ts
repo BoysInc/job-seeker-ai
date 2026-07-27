@@ -19,6 +19,8 @@ const PUBLIC_PATHS = [
   "/signup",
   "/forgot-password",
   "/reset-password",
+  "/privacy",
+  "/terms",
   "/design-preview",
 ];
 

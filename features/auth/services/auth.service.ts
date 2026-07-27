@@ -3,6 +3,7 @@ import type {
   ForgotPasswordRequest,
   LoginRequest,
   MeResponse,
+  ResendConfirmationRequest,
   ResetPasswordRequest,
   SignupRequest,
 } from "@/features/auth/models/auth.model";
@@ -88,6 +89,25 @@ export const confirmPasswordReset = async (
       access_token: request.accessToken,
       new_password: request.newPassword,
     }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseAuthError(response));
+  }
+
+  return (await response.json()) as MessageResponse;
+};
+
+export const resendConfirmationEmail = async (
+  request: ResendConfirmationRequest
+): Promise<MessageResponse> => {
+  const response = await fetch("/api/auth/resend-confirmation", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(request),
   });
 
   if (!response.ok) {

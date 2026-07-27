@@ -30,7 +30,7 @@ export const ForgotPasswordView = ({
 }: ForgotPasswordViewProps) => {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8 text-foreground sm:px-6">
-      <Card className="w-full max-w-md rounded-3xl p-6 shadow-2xl shadow-[#cfe9b8]/40 sm:rounded-4xl sm:p-8">
+      <Card className="w-full max-w-md rounded-3xl p-6 shadow-xl sm:rounded-4xl sm:p-8">
         <Link href="/" className="mb-8 flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary font-bold">
             JS
@@ -40,7 +40,7 @@ export const ForgotPasswordView = ({
           </span>
         </Link>
 
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#5f9d38]">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-foreground">
           Forgot password
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -55,7 +55,7 @@ export const ForgotPasswordView = ({
             </p>
             <Link
               href="/login"
-              className="mt-6 inline-flex text-sm font-semibold text-[#5f9d38] transition hover:text-[#4d842d]"
+              className="mt-6 inline-flex text-sm font-semibold text-accent-foreground transition hover:opacity-80"
             >
               Back to sign in
             </Link>
@@ -68,7 +68,7 @@ export const ForgotPasswordView = ({
             </p>
 
             <form onSubmit={onSubmit} className="mt-8 grid gap-4">
-              <Label className="grid gap-2 text-sm font-semibold text-zinc-700">
+              <Label className="grid gap-2 text-sm font-semibold">
                 Email
                 <Input
                   type="email"
@@ -80,7 +80,7 @@ export const ForgotPasswordView = ({
                     },
                   })}
                   autoComplete="email"
-                  className="h-12 rounded-2xl border-[#dfeecf] bg-[#fbfef8] px-4 font-normal focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-accent"
+                  className="h-12 rounded-2xl px-4 font-normal"
                 />
                 {errors.email?.message ? (
                   <span className="text-xs font-medium text-red-600">
@@ -107,7 +107,7 @@ export const ForgotPasswordView = ({
 
             <Link
               href="/login"
-              className="mt-6 inline-flex text-sm font-semibold text-[#5f9d38] transition hover:text-[#4d842d]"
+              className="mt-6 inline-flex text-sm font-semibold text-accent-foreground transition hover:opacity-80"
             >
               Back to sign in
             </Link>

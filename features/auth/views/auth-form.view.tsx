@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import type { FormEventHandler } from "react";
-import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -22,6 +24,7 @@ type AuthMode = "login" | "signup";
 
 type AuthFormViewProps = {
   mode: AuthMode;
+  control: Control<AuthFormValues>;
   errors: FieldErrors<AuthFormValues>;
   errorMessage: string | null;
   isLoading: boolean;
@@ -32,6 +35,7 @@ type AuthFormViewProps = {
 
 export const AuthFormView = ({
   mode,
+  control,
   errors,
   errorMessage,
   isLoading,
@@ -54,7 +58,7 @@ export const AuthFormView = ({
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8 text-foreground sm:px-6">
-      <Card className="w-full max-w-md rounded-3xl p-6 shadow-2xl shadow-[#cfe9b8]/40 sm:rounded-4xl sm:p-8">
+      <Card className="w-full max-w-md rounded-3xl p-6 shadow-xl sm:rounded-4xl sm:p-8">
         <Link href="/" className="mb-8 flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary font-bold">
             JS
@@ -64,7 +68,7 @@ export const AuthFormView = ({
           </span>
         </Link>
 
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#5f9d38]">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-foreground">
           {isSignup ? "Signup" : "Login"}
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
@@ -72,7 +76,7 @@ export const AuthFormView = ({
 
         <form onSubmit={onSubmit} className="mt-8 grid gap-4">
           {isSignup ? (
-            <Label className="grid gap-2 text-sm font-semibold text-zinc-700">
+            <Label className="grid gap-2 text-sm font-semibold">
               Name
               <Input
                 type="text"
@@ -80,7 +84,7 @@ export const AuthFormView = ({
                   required: isSignup ? "Enter your name." : false,
                 })}
                 autoComplete="name"
-                className="h-12 rounded-2xl border-[#dfeecf] bg-[#fbfef8] px-4 font-normal focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-accent"
+                className="h-12 rounded-2xl px-4 font-normal"
               />
               {errors.name?.message ? (
                 <span className="text-xs font-medium text-red-600">
@@ -90,7 +94,7 @@ export const AuthFormView = ({
             </Label>
           ) : null}
 
-          <Label className="grid gap-2 text-sm font-semibold text-zinc-700">
+          <Label className="grid gap-2 text-sm font-semibold">
             Email
             <Input
               type="email"
@@ -102,7 +106,7 @@ export const AuthFormView = ({
                 },
               })}
               autoComplete="email"
-              className="h-12 rounded-2xl border-[#dfeecf] bg-[#fbfef8] px-4 font-normal focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-accent"
+              className="h-12 rounded-2xl px-4 font-normal"
             />
             {errors.email?.message ? (
               <span className="text-xs font-medium text-red-600">
@@ -111,13 +115,13 @@ export const AuthFormView = ({
             ) : null}
           </Label>
 
-          <Label className="grid gap-2 text-sm font-semibold text-zinc-700">
+          <Label className="grid gap-2 text-sm font-semibold">
             <span className="flex items-center justify-between">
               Password
               {!isSignup ? (
                 <Link
                   href="/forgot-password"
-                  className="text-xs font-semibold text-[#5f9d38] transition hover:text-[#4d842d]"
+                  className="text-xs font-semibold text-accent-foreground transition hover:opacity-80"
                 >
                   Forgot password?
                 </Link>
@@ -129,7 +133,7 @@ export const AuthFormView = ({
                 validate: isSignup ? validateStrongPassword : undefined,
               })}
               autoComplete={isSignup ? "new-password" : "current-password"}
-              className="h-12 rounded-2xl border-[#dfeecf] bg-[#fbfef8] px-4 font-normal focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-accent"
+              className="h-12 rounded-2xl px-4 font-normal"
             />
             {errors.password?.message ? (
               <span className="text-xs font-medium text-red-600">
@@ -139,7 +143,7 @@ export const AuthFormView = ({
           </Label>
 
           {isSignup ? (
-            <Card className="rounded-2xl border-[#dfeecf] bg-[#fbfef8] p-4">
+            <Card className="rounded-2xl p-4">
               <div className="flex items-center justify-between text-xs font-semibold">
                 <span className="text-muted-foreground">Password strength</span>
                 <span className={passwordStrength.textClassName}>
@@ -158,12 +162,12 @@ export const AuthFormView = ({
                     <li key={rule.label} className="flex items-center gap-2">
                       <span
                         className={`h-1.5 w-1.5 rounded-full ${
-                          hasPassed ? "bg-[#5f9d38]" : "bg-zinc-300"
+                          hasPassed ? "bg-success" : "bg-border"
                         }`}
                       />
                       <span
                         className={
-                          hasPassed ? "font-medium text-[#5f9d38]" : undefined
+                          hasPassed ? "font-medium text-success" : undefined
                         }
                       >
                         {rule.label}
@@ -173,6 +177,55 @@ export const AuthFormView = ({
                 })}
               </ul>
             </Card>
+          ) : null}
+
+          {isSignup ? (
+            <div>
+              <label className="flex items-start gap-2.5 text-sm leading-6">
+                <Controller
+                  control={control}
+                  name="agreeToTerms"
+                  rules={{
+                    required:
+                      "You must agree to the Terms of Service and Privacy Policy to continue.",
+                  }}
+                  render={({ field }) => (
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked)}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      className="mt-0.5"
+                      aria-invalid={Boolean(errors.agreeToTerms)}
+                    />
+                  )}
+                />
+                <span>
+                  I agree to the{" "}
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    className="font-semibold text-accent-foreground hover:opacity-80"
+                  >
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    className="font-semibold text-accent-foreground hover:opacity-80"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </span>
+              </label>
+              {errors.agreeToTerms?.message ? (
+                <span className="mt-1 block text-xs font-medium text-red-600">
+                  {errors.agreeToTerms.message}
+                </span>
+              ) : null}
+            </div>
           ) : null}
 
           {errorMessage ? (
@@ -193,7 +246,7 @@ export const AuthFormView = ({
 
         <Link
           href={alternateHref}
-          className="mt-6 inline-flex text-sm font-semibold text-[#5f9d38] transition hover:text-[#4d842d]"
+          className="mt-6 inline-flex text-sm font-semibold text-accent-foreground transition hover:opacity-80"
         >
           {alternateLabel}
         </Link>

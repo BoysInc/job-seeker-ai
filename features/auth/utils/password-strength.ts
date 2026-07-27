@@ -29,8 +29,8 @@ export const getPasswordStrength = (password: string) => {
     return {
       score,
       label: "Enter a password",
-      indicatorClassName: "**:data-[slot=progress-indicator]:bg-zinc-200",
-      textClassName: "text-zinc-500",
+      indicatorClassName: "**:data-[slot=progress-indicator]:bg-muted-foreground/30",
+      textClassName: "text-muted-foreground",
     };
   }
 
@@ -38,8 +38,8 @@ export const getPasswordStrength = (password: string) => {
     return {
       score,
       label: "Weak",
-      indicatorClassName: "**:data-[slot=progress-indicator]:bg-red-500",
-      textClassName: "text-red-600",
+      indicatorClassName: "**:data-[slot=progress-indicator]:bg-destructive",
+      textClassName: "text-destructive",
     };
   }
 
@@ -47,16 +47,16 @@ export const getPasswordStrength = (password: string) => {
     return {
       score,
       label: "Medium",
-      indicatorClassName: "**:data-[slot=progress-indicator]:bg-amber-500",
-      textClassName: "text-amber-600",
+      indicatorClassName: "**:data-[slot=progress-indicator]:bg-warning",
+      textClassName: "text-warning",
     };
   }
 
   return {
     score,
     label: "Strong",
-    indicatorClassName: "**:data-[slot=progress-indicator]:bg-[#5f9d38]",
-    textClassName: "text-[#5f9d38]",
+    indicatorClassName: "**:data-[slot=progress-indicator]:bg-success",
+    textClassName: "text-success",
   };
 };
 

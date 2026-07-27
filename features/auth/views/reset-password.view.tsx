@@ -34,7 +34,7 @@ type ResetPasswordViewProps = {
 
 const Shell = ({ children }: { children: ReactNode }) => (
   <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8 text-foreground sm:px-6">
-    <Card className="w-full max-w-md rounded-3xl p-6 shadow-2xl shadow-[#cfe9b8]/40 sm:rounded-4xl sm:p-8">
+    <Card className="w-full max-w-md rounded-3xl p-6 shadow-xl sm:rounded-4xl sm:p-8">
       <Link href="/" className="mb-8 flex items-center gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary font-bold">
           JS
@@ -49,7 +49,7 @@ const Shell = ({ children }: { children: ReactNode }) => (
 );
 
 const Eyebrow = ({ children }: { children: ReactNode }) => (
-  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#5f9d38]">
+  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-foreground">
     {children}
   </p>
 );
@@ -91,7 +91,7 @@ export const ResetPasswordView = ({
         </p>
         <Link
           href="/forgot-password"
-          className="mt-6 inline-flex text-sm font-semibold text-[#5f9d38] transition hover:text-[#4d842d]"
+          className="mt-6 inline-flex text-sm font-semibold text-accent-foreground transition hover:opacity-80"
         >
           Request a new reset link
         </Link>
@@ -111,7 +111,7 @@ export const ResetPasswordView = ({
         </p>
         <Link
           href="/login"
-          className="mt-6 inline-flex text-sm font-semibold text-[#5f9d38] transition hover:text-[#4d842d]"
+          className="mt-6 inline-flex text-sm font-semibold text-accent-foreground transition hover:opacity-80"
         >
           Go to sign in
         </Link>
@@ -129,7 +129,7 @@ export const ResetPasswordView = ({
       </h1>
 
       <form onSubmit={onSubmit} className="mt-8 grid gap-4">
-        <Label className="grid gap-2 text-sm font-semibold text-zinc-700">
+        <Label className="grid gap-2 text-sm font-semibold">
           New password
           <PasswordInput
             {...register("password", {
@@ -137,7 +137,7 @@ export const ResetPasswordView = ({
               validate: validateStrongPassword,
             })}
             autoComplete="new-password"
-            className="h-12 rounded-2xl border-[#dfeecf] bg-[#fbfef8] px-4 font-normal focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-accent"
+            className="h-12 rounded-2xl px-4 font-normal"
           />
           {errors.password?.message ? (
             <span className="text-xs font-medium text-red-600">
@@ -146,7 +146,7 @@ export const ResetPasswordView = ({
           ) : null}
         </Label>
 
-        <Card className="rounded-2xl border-[#dfeecf] bg-[#fbfef8] p-4">
+        <Card className="rounded-2xl p-4">
           <div className="flex items-center justify-between text-xs font-semibold">
             <span className="text-muted-foreground">Password strength</span>
             <span className={passwordStrength.textClassName}>
@@ -165,12 +165,12 @@ export const ResetPasswordView = ({
                 <li key={rule.label} className="flex items-center gap-2">
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${
-                      hasPassed ? "bg-[#5f9d38]" : "bg-zinc-300"
+                      hasPassed ? "bg-success" : "bg-border"
                     }`}
                   />
                   <span
                     className={
-                      hasPassed ? "font-medium text-[#5f9d38]" : undefined
+                      hasPassed ? "font-medium text-success" : undefined
                     }
                   >
                     {rule.label}
@@ -181,14 +181,14 @@ export const ResetPasswordView = ({
           </ul>
         </Card>
 
-        <Label className="grid gap-2 text-sm font-semibold text-zinc-700">
+        <Label className="grid gap-2 text-sm font-semibold">
           Confirm new password
           <PasswordInput
             {...register("confirmPassword", {
               required: "Confirm your new password.",
             })}
             autoComplete="new-password"
-            className="h-12 rounded-2xl border-[#dfeecf] bg-[#fbfef8] px-4 font-normal focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-accent"
+            className="h-12 rounded-2xl px-4 font-normal"
           />
           {errors.confirmPassword?.message ? (
             <span className="text-xs font-medium text-red-600">

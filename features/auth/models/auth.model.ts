@@ -31,7 +31,9 @@ export type AuthSession = {
 
 export type AuthResponse = {
   user: AuthUser;
-  session: AuthSession;
+  // Null when the account requires email verification before a session
+  // can be issued (Supabase's "Confirm email" setting is on).
+  session: AuthSession | null;
 };
 
 export type LoginRequest = {
@@ -43,9 +45,13 @@ export type SignupRequest = LoginRequest & {
   name: string;
 };
 
-export type AuthFormValues = SignupRequest;
+export type AuthFormValues = SignupRequest & { agreeToTerms: boolean };
 
 export type ForgotPasswordRequest = {
+  email: string;
+};
+
+export type ResendConfirmationRequest = {
   email: string;
 };
 

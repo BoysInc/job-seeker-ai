@@ -39,7 +39,10 @@ export const useAuthStore = create<AuthStore>()(
         set({
           user: auth.user,
           session: auth.session,
-          status: "authenticated",
+          // Signup can return a null session when the account still needs
+          // email verification - only mark "authenticated" once there's
+          // actually a session to use.
+          status: auth.session ? "authenticated" : "unauthenticated",
           errorMessage: null,
         }),
       setProfile: (profile) => set({ profile }),
