@@ -15,6 +15,7 @@ import {
 import { useAuthStore } from "@/features/auth/store/auth.store";
 
 const PUBLIC_PATHS = [
+  "/",
   "/login",
   "/signup",
   "/forgot-password",
