@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { AppNavbar } from "@/components/app-navbar";
+import { MatchScoreBadge } from "@/components/match-score";
 import { NavAuthActions } from "@/components/nav-auth-actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,7 @@ export const JobDetailView = ({
       <section className="mx-auto flex w-full max-w-7xl flex-col px-4 sm:px-6 lg:px-8">
         {!job ? (
           <div className="flex flex-1 flex-col items-center justify-center px-4 py-20 text-center sm:py-32">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#5f9d38]">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-foreground">
               Not found
             </p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -75,12 +76,12 @@ export const JobDetailView = ({
           </div>
         ) : (
           <div className="py-10 sm:py-14 lg:py-20">
-            <div className="mb-6 flex min-w-0 items-center gap-2 text-sm text-zinc-500 sm:mb-8">
-              <Link href="/jobs" className="shrink-0 transition hover:text-zinc-950">
+            <div className="mb-6 flex min-w-0 items-center gap-2 text-sm text-muted-foreground sm:mb-8">
+              <Link href="/jobs" className="shrink-0 transition hover:text-foreground">
                 Matched jobs
               </Link>
               <span className="shrink-0">/</span>
-              <span className="truncate text-zinc-950">{job.title}</span>
+              <span className="truncate text-foreground">{job.title}</span>
             </div>
 
             <div className="grid gap-8 lg:grid-cols-[1fr_minmax(0,360px)] lg:gap-10">
@@ -88,7 +89,7 @@ export const JobDetailView = ({
                 <Card className="rounded-2xl p-5 sm:rounded-3xl sm:p-8">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#5f9d38]">
+                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-foreground">
                         {job.company}
                       </p>
                       <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
@@ -99,13 +100,14 @@ export const JobDetailView = ({
                       </p>
                     </div>
 
-                    <div className="flex shrink-0 flex-wrap gap-2">
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
                       {typeof job.fit_score === "number" ? (
-                        <Badge className="h-7 px-3 text-xs sm:px-4 sm:text-sm">
-                          {job.fit_score}% fit
-                        </Badge>
+                        <MatchScoreBadge score={job.fit_score} size="lg" />
                       ) : null}
-                      <Badge className="h-7 max-w-full bg-accent px-3 text-xs text-[#5f9d38] sm:px-4 sm:text-sm">
+                      <Badge
+                        variant="outline"
+                        className="h-7 max-w-full px-3 text-xs sm:px-4 sm:text-sm"
+                      >
                         {formatSalary(job.salary)}
                       </Badge>
                     </div>
@@ -151,16 +153,14 @@ export const JobDetailView = ({
               <div className="flex flex-col gap-4 sm:gap-6">
                 {job.why_good_fit?.length ? (
                   <Card className="rounded-2xl p-5 sm:rounded-3xl sm:p-6">
-                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#5f9d38]">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-success">
                       Why you&apos;re a good fit
                     </p>
                     <ul className="mt-4 grid gap-3">
                       {job.why_good_fit.map((reason) => (
                         <li key={reason} className="flex items-start gap-3">
-                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-                          <span className="text-sm leading-6 text-zinc-700">
-                            {reason}
-                          </span>
+                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-success" />
+                          <span className="text-sm leading-6">{reason}</span>
                         </li>
                       ))}
                     </ul>
@@ -169,16 +169,14 @@ export const JobDetailView = ({
 
                 {job.possible_gaps?.length ? (
                   <Card className="rounded-2xl p-5 sm:rounded-3xl sm:p-6">
-                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-600">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-warning">
                       Possible gaps
                     </p>
                     <ul className="mt-4 grid gap-3">
                       {job.possible_gaps.map((gap) => (
                         <li key={gap} className="flex items-start gap-3">
-                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-amber-400" />
-                          <span className="text-sm leading-6 text-zinc-700">
-                            {gap}
-                          </span>
+                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-warning" />
+                          <span className="text-sm leading-6">{gap}</span>
                         </li>
                       ))}
                     </ul>
@@ -191,7 +189,7 @@ export const JobDetailView = ({
                       <a href={job.url} target="_blank" rel="noreferrer noopener" />
                     }
                     variant="outline"
-                    className="h-12 w-full gap-2 rounded-full border-[#a9d98a] bg-accent px-6 text-sm hover:bg-[#d4f0be] sm:w-auto"
+                    className="h-12 w-full gap-2 rounded-full px-6 text-sm sm:w-auto"
                   >
                     Apply for this job
                     <svg
